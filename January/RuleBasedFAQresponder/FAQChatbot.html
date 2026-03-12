@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Institute FAQ Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 450px;
+            max-width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-box {
+            height: 400px;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin: 12px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 75%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot {
+            background: #ffffff;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 12px 24px;
+            margin-left: 10px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">Symbiosis Institute Chatbot ðŸ¤–</div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">
+            Hello! Ask me about institute timings, fees, courses, contact details, etc.
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Keyword groups for semantic matching
+    const keywordGroups = {
+        timing: {
+            keywords: ["timing", "hours", "time", "schedule", "open", "close", "operating"],
+            response: "The institute operates from 9:00 AM to 5:00 PM, Monday to Friday."
+        },
+        office: {
+            keywords: ["office", "administration", "admin", "staff"],
+            response: "Office hours are from 10:00 AM to 4:00 PM."
+        },
+        courses: {
+            keywords: ["course", "program", "degree", "study", "curriculum", "qualification", "branch"],
+            response: "We offer B.Tech, M.Tech, MBA, and Diploma programs."
+        },
+        admission: {
+            keywords: ["admission", "admit", "enroll", "enrollment", "join", "entry", "apply", "application"],
+            response: "Admissions are through entrance exams followed by counseling."
+        },
+        fees: {
+            keywords: ["fees", "fee", "tuition", "tution", "payment", "cost", "charge", "price", "expense"],
+            response: "Fee structure varies by course. Please check the official website or contact the administration office."
+        },
+        scholarship: {
+            keywords: ["scholarship", "financial aid", "grant", "stipend", "concession", "waiver"],
+            response: "Scholarships are available for eligible students based on merit and need."
+        },
+        contact: {
+            keywords: ["contact", "phone", "call", "number", "mobile", "telephone", "reach"],
+            response: "You can contact us at +91-9876543210."
+        },
+        email: {
+            keywords: ["email", "mail", "e-mail"],
+            response: "Our email ID is info@institute.edu."
+        },
+        location: {
+            keywords: ["location", "address", "where", "situated", "place", "directions"],
+            response: "We are located in Nagpur, Maharashtra."
+        },
+        hostel: {
+            keywords: ["hostel", "accommodation", "residence", "dorm", "dormitory", "housing", "stay"],
+            response: "Yes, hostel facilities are available for boys and girls with modern amenities."
+        },
+        placement: {
+            keywords: ["placement", "job", "career", "recruitment", "hiring", "employment", "company"],
+            response: "We provide placement assistance with reputed companies. Our placement cell actively connects students with recruiters."
+        },
+        library: {
+            keywords: ["library", "books", "reading room", "study hall"],
+            response: "The library is open from 9:00 AM to 8:00 PM with a wide collection of books and journals."
+        },
+        exam: {
+            keywords: ["exam", "examination", "test", "assessment", "evaluation"],
+            response: "Exams are conducted as per the academic calendar. Check the notice board for schedules."
+        },
+        website: {
+            keywords: ["website", "site", "portal", "online", "web"],
+            response: "Visit our website at www.institute.edu for more information."
+        },
+        faculty: {
+            keywords: ["faculty", "teacher", "professor", "staff", "instructor", "lecturer"],
+            response: "We have highly qualified faculty members with expertise in their respective fields."
+        },
+        lab: {
+            keywords: ["lab", "laboratory", "practical", "workshop"],
+            response: "We have well-equipped laboratories for hands-on learning and research."
+        },
+        sports: {
+            keywords: ["sport", "sports", "game", "playground", "gym", "fitness"],
+            response: "Sports facilities including gym, playground, and indoor games are available for students."
+        },
+        cafeteria: {
+            keywords: ["cafeteria", "canteen", "food", "mess", "dining", "cafe"],
+            response: "The cafeteria serves hygienic and nutritious food at affordable prices."
+        },
+        transport: {
+            keywords: ["transport", "bus", "shuttle", "travel", "commute"],
+            response: "Bus facilities are available for students from various locations in the city."
+        },
+        goodbye: {
+            keywords: ["bye", "goodbye", "exit", "quit", "thanks", "thank you"],
+            response: "Thank you for chatting! Have a great day ðŸ˜Š"
+        }
+    };
+
+    function sendMessage() {
+        const input = document.getElementById("userInput");
+        const userText = input.value.trim();
+        if (userText === "") return;
+
+        addMessage(userText, "user");
+        const botReply = getBotResponse(userText);
+        setTimeout(() => addMessage(botReply, "bot"), 500);
+
+        input.value = "";
+    }
+
+    function addMessage(text, sender) {
+        const chatBox = document.getElementById("chatBox");
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "message " + sender;
+        msgDiv.innerText = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotResponse(input) {
+        input = input.toLowerCase();
+
+        // Check each keyword group
+        for (const [category, data] of Object.entries(keywordGroups)) {
+            for (const keyword of data.keywords) {
+                if (input.includes(keyword)) {
+                    return data.response;
+                }
+            }
+        }
+
+        // Default response if no match found
+        return "Sorry, I didn't understand. Please ask about timings, fees, courses, admissions, placements, contact details, or other facilities.";
+    }
+</script>
+
+</body>
+</html>

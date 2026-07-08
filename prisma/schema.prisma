@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id
+  name      String
+  email     String    @unique
+  password  String
+  role      String    @default("student")
+  isActive  Boolean   @default(true)
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  students  Student[] @relation("CreatedStudents")
+}
+
+model Student {
+  id          String   @id
+  name        String
+  email       String   @unique
+  phone       String
+  age         Int
+  department  String
+  semester    Int
+  address     Json     @default("{}")
+  createdBy   String?
+  creator     User?    @relation("CreatedStudents", fields: [createdBy], references: [id], onDelete: SetNull)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

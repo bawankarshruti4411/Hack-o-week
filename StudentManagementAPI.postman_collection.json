@@ -1,0 +1,399 @@
+{
+  "info": {
+    "name": "Student Management API",
+    "description": "Complete REST API collection for Student Management System with JWT auth, CRUD, search, pagination, sorting, and filtering.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5000/api/v1", "type": "string" },
+    { "key": "TOKEN", "value": "", "type": "string" },
+    { "key": "STUDENT_ID", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/health",
+            "description": "Check if the API server is running."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data?.token) {",
+                  "  pm.collectionVariables.set('TOKEN', res.data.token);",
+                  "  console.log('Token saved:', res.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123\",\n  \"role\": \"admin\"\n}"
+            },
+            "description": "Register a new admin account."
+          }
+        },
+        {
+          "name": "Register Student User",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Student User\",\n  \"email\": \"student@example.com\",\n  \"password\": \"Student123\",\n  \"role\": \"student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data?.token) {",
+                  "  pm.collectionVariables.set('TOKEN', res.data.token);",
+                  "  console.log('Token saved successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123\"\n}"
+            },
+            "description": "Login with credentials. Token is auto-saved."
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "url": "{{BASE_URL}}/auth/change-password",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin123\",\n  \"newPassword\": \"NewAdmin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Students",
+      "item": [
+        {
+          "name": "Create Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data?.student?._id) {",
+                  "  pm.collectionVariables.set('STUDENT_ID', res.data.student._id);",
+                  "  console.log('Student ID saved:', res.data.student._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/students",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul@example.com\",\n  \"phone\": \"9876543210\",\n  \"age\": 20,\n  \"department\": \"Computer Science\",\n  \"semester\": 4,\n  \"address\": {\n    \"street\": \"123 Main Street\",\n    \"city\": \"Nagpur\",\n    \"state\": \"Maharashtra\",\n    \"pincode\": \"440001\",\n    \"country\": \"India\"\n  }\n}"
+            },
+            "description": "Admin only. Creates a new student."
+          }
+        },
+        {
+          "name": "Create Student 2",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/students",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Patel\",\n  \"email\": \"priya@example.com\",\n  \"phone\": \"9123456789\",\n  \"age\": 19,\n  \"department\": \"Information Technology\",\n  \"semester\": 2,\n  \"address\": {\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"pincode\": \"400001\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Student 3",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/students",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Amit Kumar\",\n  \"email\": \"amit@example.com\",\n  \"phone\": \"9988776655\",\n  \"age\": 22,\n  \"department\": \"Mechanical\",\n  \"semester\": 6\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/students",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Get All Students - Paginated",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?page=1&limit=5",
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Search Students",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?search=rahul",
+              "query": [{ "key": "search", "value": "rahul" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Filter by Department",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?department=Computer Science",
+              "query": [{ "key": "department", "value": "Computer Science" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Filter by Semester",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?semester=4",
+              "query": [{ "key": "semester", "value": "4" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Filter by Age Range",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?minAge=18&maxAge=21",
+              "query": [
+                { "key": "minAge", "value": "18" },
+                { "key": "maxAge", "value": "21" }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Sort by Name (Ascending)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?sort=name",
+              "query": [{ "key": "sort", "value": "name" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Sort by Age (Descending)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?sort=-age",
+              "query": [{ "key": "sort", "value": "-age" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Combined: Search + Filter + Sort + Paginate",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/students?page=1&limit=5&sort=-createdAt&department=Computer Science&minAge=18",
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "5" },
+                { "key": "sort", "value": "-createdAt" },
+                { "key": "department", "value": "Computer Science" },
+                { "key": "minAge", "value": "18" }
+              ]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/students/{{STUDENT_ID}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "url": "{{BASE_URL}}/students/{{STUDENT_ID}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"semester\": 5,\n  \"age\": 21,\n  \"address\": {\n    \"city\": \"Pune\",\n    \"state\": \"Maharashtra\"\n  }\n}"
+            },
+            "description": "Admin only. Updates a student partially."
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "url": "{{BASE_URL}}/students/{{STUDENT_ID}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "description": "Admin only. Permanently deletes a student."
+          }
+        },
+        {
+          "name": "Get Department Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/students/stats/departments",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "description": "Admin only. Returns aggregate stats per department."
+          }
+        }
+      ]
+    },
+    {
+      "name": "❌ Error Scenarios",
+      "item": [
+        {
+          "name": "Invalid Login",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"wrong@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Access Without Token",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/students"
+          }
+        },
+        {
+          "name": "Invalid Student ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/students/invalid-id-123",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
+          "name": "Create Student - Validation Error",
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/students",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"A\",\n  \"email\": \"not-an-email\",\n  \"age\": 100\n}"
+            }
+          }
+        },
+        {
+          "name": "Route Not Found",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/nonexistent-route"
+          }
+        }
+      ]
+    }
+  ]
+}

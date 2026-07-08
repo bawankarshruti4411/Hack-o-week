@@ -1,6 +1,6 @@
 # 🎓 Student Management REST API
 
-A production-ready REST API for managing students, built with **Node.js**, **Express.js**, and **MongoDB**.
+A production-ready REST API for managing students, built with **Node.js**, **Express.js**, **PostgreSQL**, and **Prisma ORM**.
 
 ---
 
@@ -10,7 +10,7 @@ A production-ready REST API for managing students, built with **Node.js**, **Exp
 |---|---|
 | Runtime | Node.js (v18+) |
 | Framework | Express.js |
-| Database | MongoDB + Mongoose |
+| Database | PostgreSQL + Prisma ORM |
 | Auth | JWT + bcryptjs |
 | Validation | express-validator |
 | Security | Helmet, CORS, Rate Limiting |
@@ -23,9 +23,12 @@ A production-ready REST API for managing students, built with **Node.js**, **Exp
 
 ```
 student-api/
+├── prisma/
+│   ├── schema.prisma            # Prisma schema (PostgreSQL)
+│   └── migrations/              # Database migration logs
 ├── src/
 │   ├── config/
-│   │   └── database.js          # MongoDB connection
+│   │   └── database.js          # Prisma Client setup
 │   ├── controllers/
 │   │   ├── auth.controller.js   # Auth logic
 │   │   └── student.controller.js
@@ -33,9 +36,6 @@ student-api/
 │   │   ├── auth.middleware.js   # JWT + Role middleware
 │   │   ├── error.middleware.js  # Global error handler
 │   │   └── validate.middleware.js
-│   ├── models/
-│   │   ├── User.js              # User schema
-│   │   └── Student.js           # Student schema
 │   ├── routes/
 │   │   ├── auth.routes.js
 │   │   ├── student.routes.js
@@ -55,6 +55,7 @@ student-api/
 │   │   └── swagger.js           # Swagger config
 │   ├── app.js                   # Express app setup
 │   └── server.js                # Entry point
+├── prisma.config.ts             # Prisma environment config
 ├── .env.example
 ├── .env
 ├── .gitignore
@@ -69,7 +70,7 @@ student-api/
 
 ### Prerequisites
 - Node.js v18+
-- MongoDB (local or Atlas)
+- PostgreSQL (local or cloud-hosted like Neon)
 - Git
 
 ---
@@ -96,17 +97,17 @@ npm init -y
 ### Step 4 — Install Dependencies
 
 ```bash
-npm install express mongoose bcryptjs jsonwebtoken express-validator helmet cors express-rate-limit morgan dotenv swagger-jsdoc swagger-ui-express
+npm install express @prisma/client @prisma/adapter-pg pg bcryptjs jsonwebtoken express-validator helmet cors express-rate-limit morgan dotenv swagger-jsdoc swagger-ui-express
 ```
 
 ```bash
-npm install --save-dev nodemon
+npm install --save-dev prisma nodemon
 ```
 
 ### Step 5 — Create Folder Structure
 
 ```bash
-mkdir -p src/{config,controllers,middleware,models,routes,validators,utils,services,docs}
+mkdir -p src/{config,controllers,middleware,routes,validators,utils,services,docs}
 ```
 
 ### Step 6 — Configure Environment
@@ -115,16 +116,14 @@ mkdir -p src/{config,controllers,middleware,models,routes,validators,utils,servi
 cp .env.example .env
 ```
 
-Edit `.env` with your MongoDB URI and JWT secret.
+Edit `.env` with your PostgreSQL connection URL (`DATABASE_URL`).
 
-### Step 7 — Start MongoDB
+### Step 7 — Sync Database Schema
 
-**Local MongoDB:**
+Run Prisma schema synchronization to initialize your database tables:
 ```bash
-mongod
+npx prisma db push
 ```
-
-**Or use MongoDB Atlas** — replace `MONGO_URI` in `.env` with your Atlas connection string.
 
 ### Step 8 — Run Server
 

@@ -16,14 +16,16 @@ app.use(helmet());
 // CORS Configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000'];
+  : ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5173'];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, curl)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      
+      const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      if (allowedOrigins.includes(origin) || isLocalhost) {
         return callback(null, true);
       }
       callback(new Error(`CORS: Origin '${origin}' not allowed`));

@@ -1,0 +1,21 @@
+{
+  "name": "student-management-api",
+  "version": "1.0.0",
+  "description": "A beginner-friendly Student Management REST API built with Node.js and Express.js, using an in-memory data store.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "express",
+    "rest-api",
+    "nodejs",
+    "student-management",
+    "crud"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

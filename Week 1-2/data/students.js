@@ -1,13 +1,3 @@
-// data/students.js
-// This file holds our "database" for the project.
-// Since we are NOT using a real database, we simply store
-// student records in a JavaScript array that lives in memory.
-//
-// IMPORTANT: Because this is just an array in memory, all data
-// will reset back to these 5 sample students every time the
-// server is restarted.
-
-// Pre-loaded sample student records
 let students = [
   {
     id: 1,
@@ -45,23 +35,12 @@ let students = [
     email: "arjun@example.com",
   },
 ];
-
-// nextId keeps track of which ID should be assigned to the
-// next student that gets created. It starts at 6 because we
-// already used IDs 1 to 5 for the sample data above.
 let nextId = 6;
-
-// A small helper function so the controller doesn't need to
-// know how "nextId" works internally. It just calls this
-// function and gets back a fresh, unused ID.
 function getNextId() {
   const idToUse = nextId;
   nextId = nextId + 1;
   return idToUse;
 }
-
-// We export the array and the helper function so that the
-// controller file can use (and modify) them.
 module.exports = {
   students,
   getNextId,
